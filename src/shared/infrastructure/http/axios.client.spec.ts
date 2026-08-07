@@ -242,3 +242,28 @@ describe('axios.client — structured error logging', () => {
     expect(vi.mocked(logHttpError)).toHaveBeenCalledOnce();
   });
 });
+
+describe('axios.client — doRefresh', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('posts to /auth/refresh and stores the returned access token', async () => {
+    const setAccessToken = vi.fn();
+    vi.mocked(useSessionStore.getState).mockReturnValue({
+      accessToken: null,
+      clearAccessToken: vi.fn(),
+      redirectToLogin: vi.fn(),
+      setAccessToken,
+    });
+
+    const { doRefresh, bareHttp } = await import('./axios.client');
+    vi.spyOn(bareHttp, 'post').mockResolvedValue({ data: { accessToken: 'fresh-token' } });
+
+    const token = await doRefresh();
+
+    expect(token).toBe('fresh-token');
+    expect(setAccessToken).toHaveBeenCalledWith('fresh-token');
+    expect(bareHttp.post).toHaveBeenCalledWith('/auth/refresh');
+  });
+});

@@ -47,5 +47,14 @@ describe('session.store', () => {
       useSessionStore.getState().redirectToLogin();
       expect(replace).not.toHaveBeenCalled();
     });
+
+    it('redirects to an unprefixed login route when the path has no locale segment', () => {
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/dashboard', replace },
+        writable: true,
+      });
+      useSessionStore.getState().redirectToLogin();
+      expect(replace).toHaveBeenCalledWith('/login');
+    });
   });
 });

@@ -20,7 +20,8 @@ export const useSessionStore = create<SessionState>()((set) => ({
   setAccessToken: (token) => set({ accessToken: token }),
   clearAccessToken: () => set({ accessToken: null }),
   redirectToLogin: () => {
-    if (typeof window === 'undefined') return; // SSR-safe no-op
+    /* v8 ignore next -- SSR guard: window is always defined under jsdom */
+    if (typeof window === 'undefined') return;
     const { pathname } = window.location;
     if (pathname.includes('/login')) return; // already on a login route — no loop
     const localePrefix = pathname.match(/^\/[a-z]{2}(?=\/|$)/)?.[0] ?? '';

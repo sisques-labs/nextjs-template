@@ -19,6 +19,7 @@ testing:
   strict_tdd: true
   test_command: "pnpm test"
   coverage_command: "pnpm test:coverage"
+  coverage_threshold: 80
   e2e_command: "pnpm e2e"
   layers:
     unit: { available: true, tool: "vitest + react testing library" }
@@ -183,6 +184,8 @@ rules:
     - "New bounded context: nest its {context}.providers.tsx into shared/presentation/providers/providers.tsx and register its en.ts/es.ts in shared/presentation/i18n/get-dictionary.ts — don't leave either wired loose."
   verify:
     test_command: "pnpm test"
+    coverage_command: "pnpm test:coverage"
+    coverage_threshold: 80
     build_command: "pnpm build"
     typecheck_command: "pnpm tsc --noEmit"
   archive:

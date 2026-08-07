@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ApolloLink, Observable } from '@apollo/client';
 import type { FetchResult } from '@apollo/client';
 import { gql } from '@apollo/client';
@@ -389,5 +389,48 @@ describe('loggingLink', () => {
     expect(vi.mocked(logHttpError)).toHaveBeenCalledOnce();
     const [log] = vi.mocked(logHttpError).mock.calls[0];
     expect(log.status).toBeUndefined();
+  });
+});
+
+// ──────────────────────────────────────────────
+// fetchWithTimeout
+// ──────────────────────────────────────────────
+describe('fetchWithTimeout', () => {
+  const originalFetch = globalThis.fetch;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    globalThis.fetch = originalFetch;
+  });
+
+  it('forwards the request and resolves with the fetch response', async () => {
+    const response = new Response('ok');
+    globalThis.fetch = vi.fn().mockResolvedValue(response);
+
+    const { fetchWithTimeout } = await import('./apollo.client');
+    const result = await fetchWithTimeout('https://example.com/graphql');
+
+    expect(result).toBe(response);
+    expect(globalThis.fetch).toHaveBeenCalledOnce();
+  });
+
+  it('aborts the request once the timeout elapses', async () => {
+    let signal: AbortSignal | undefined;
+    globalThis.fetch = vi.fn((_input, init) => {
+      signal = (init as RequestInit).signal ?? undefined;
+      return new Promise<Response>(() => {}); // never resolves — simulates a hung request
+    });
+
+    const { fetchWithTimeout } = await import('./apollo.client');
+    void fetchWithTimeout('https://example.com/graphql');
+
+    expect(signal?.aborted).toBe(false);
+    await vi.runOnlyPendingTimersAsync();
+    expect(signal?.aborted).toBe(true);
   });
 });

@@ -20,7 +20,21 @@ export default defineConfig({
         'src/shared/presentation/components/ui/**',
         'src/**/index.ts',
         'src/**/*.d.ts',
+        // Structural, logic-free files — enum declarations, provider wrappers
+        // that only compose JSX, thin client instantiation, and the i18n
+        // dictionary aggregator (a lookup table with no branching of its own).
+        'src/shared/domain/enums/**',
+        'src/shared/presentation/providers/**',
+        'src/shared/infrastructure/http/query.client.ts',
+        'src/shared/infrastructure/http/http-logger.ts',
+        'src/shared/presentation/i18n/get-dictionary.ts',
       ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
     },
   },
   resolve: {

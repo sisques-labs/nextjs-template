@@ -93,11 +93,12 @@ No barrel `index.ts` files unless the module explicitly needs a public API surfa
 ## Testing — Strict TDD (mandatory)
 
 - `pnpm test` — unit (Vitest + React Testing Library)
-- `pnpm test:coverage` — coverage
+- `pnpm test:coverage` — coverage, enforced at an **80% threshold** (lines/functions/branches/statements) via `vitest.config.ts` → `test.coverage.thresholds`
 - Integration and e2e (Playwright) not yet implemented
 - `pnpm lint` / `pnpm tsc --noEmit` before considering work done
 - Tests co-located as `.spec.ts`/`.test.tsx` next to source. Write RED first, then GREEN.
 - GQL repositories are unit-tested by mocking `apolloClient` directly (`vi.mock`), not a live schema.
+- Structural, logic-free files (enum declarations, provider wrappers that only compose JSX, thin client instantiation, the i18n dictionary aggregator) are excluded from coverage collection in `vitest.config.ts` → `test.coverage.exclude` rather than padding the threshold with untestable boilerplate. A guard clause that's unreachable under the jsdom test environment (e.g. an SSR `typeof window === 'undefined'` check) gets a `/* v8 ignore next */` comment instead of being left uncovered — don't chase coverage on it with fake environment overrides.
 
 ## Storybook (mandatory)
 

@@ -10,7 +10,7 @@ import { GRAPHQL_URL, HTTP_TIMEOUT_MS } from '@/shared/config/env';
 import { logHttpError } from './http-logger';
 
 // ── fetchWithTimeout ────────────────────────────────────────────────────────
-function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+export function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), HTTP_TIMEOUT_MS);
   return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
